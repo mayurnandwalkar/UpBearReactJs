@@ -1,12 +1,50 @@
-import React from 'react'
+import React,{ useState,useEffect } from 'react'
 import Bitcoin from "../assets/image/bitcoin-btc-logo.svg"
 import RedGraph from "../assets/image/red_graph.svg"
 import Ethereum from "../assets/image/ethereum.svg"
 import GreenGraph from "../assets/image/green_graph.svg"
 import Solana from "../assets/image/solana-sol-logo.svg"
 import Binance from "../assets/image/binance-usd-busd-logo.svg"
+import coinService from '../services/coin.service'
 
 const Earn = () => {
+    const [coinDetails, setCoinDetails] = useState([])
+    const [lastApiCall, setLastApiCall] = useState(null);
+    const recurringFunction = async (setdata=false) => {
+        if(setdata){
+            const response1 = await coinService.setCoinsDetails();
+        }
+        const response = await coinService.getCoinsDetails();
+        setCoinDetails(response.data.data)
+    }
+    useEffect(() => {
+        coinService.getCoinsDetails().then((response) => {
+            setCoinDetails(response.data.data)
+            const storedTimestamp = new Date(Date.parse(response.data.data[3].updatedAt));
+            if (storedTimestamp) {
+                setLastApiCall(storedTimestamp);
+            }
+        }).catch((e) => {
+            console.log(e.response.data.message)
+        })        
+    }, []);
+    useEffect(() => {
+        console.log("first1")
+        const currentTime = new Date();
+        const timeDifference = currentTime - lastApiCall;
+        console.log(lastApiCall,"lastApiCall")
+        console.log(timeDifference,"timeDifference >= 3000")
+        if (lastApiCall === null || timeDifference >= 3000) {
+            console.log("first2")
+            recurringFunction(true);
+            setLastApiCall(currentTime);
+        }
+        const intervalId = setInterval(() => {
+            recurringFunction(true);
+            setLastApiCall(new Date());
+        }, 3000);
+        return () => clearInterval(intervalId);
+    }, [lastApiCall]);
     return (
         <>
             <section className="earn-section section">
@@ -43,90 +81,25 @@ const Earn = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div className="tableName">
-                                                        1 <img src={Bitcoin} alt="bitcoin" className="tableIcon" /> Bitcoin <span>BTC</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                $46,575.34
-                                                </td>
-                                                <td>
-                                                    <span className="text-green"> +0.29% </span>
-                                                </td>
-                                                <td>
-                                                    <div className="graph_img">
-                                                        <img src={RedGraph} alt="red_graph" />
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <a href="#" className="buy_btn">Buy</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div className="tableName">
-                                                        2 <img src={Ethereum} alt="ethereum" className="tableIcon" /> Ethereum <span>ETH</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                $3,852.57
-                                                </td>
-                                                <td>
-                                                    <span className="text-green"> +1.46% </span>
-                                                </td>
-                                                <td>
-                                                    <div className="graph_img">
-                                                        <img src={GreenGraph} alt="green_graph" />
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <a href="#" className="buy_btn">Buy</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div className="tableName">
-                                                        3 <img src={Solana} alt="solana" className="tableIcon" /> Solana <span>SOL</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                $171,28
-                                                </td>
-                                                <td>
-                                                    <span className="text-green"> +0.68% </span>
-                                                </td>
-                                                <td>
-                                                    <div className="graph_img">
-                                                        <img src={RedGraph} alt="red_graph" />
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <a href="#" className="buy_btn">Buy</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div className="tableName">
-                                                        4 <img src={Binance} alt="binance" className="tableIcon" /> Binance <span>BNB</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                $517.76
-                                                </td>
-                                                <td>
-                                                    <span className="text-green"> +0.35% </span>
-                                                </td>
-                                                <td>
-                                                    <div className="graph_img">
-                                                        <img src={GreenGraph} alt="green_graph" />
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <a href="#" className="buy_btn">Buy</a>
-                                                </td>
-                                            </tr>
+                                            {
+                                                coinDetails.map((coinDetail,i) =>
+                                                    <tr key={i}>
+                                                        <td>
+                                                            <div className="tableName">
+                                                                {i+1} <img src={coinDetail.icon} alt="bitcoin"  className="tableIcon" /> {coinDetail.name} <span>{coinDetail.symbol}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>${coinDetail.price}</td>
+                                                        <td><span className="text-green"> {coinDetail.price24h>0?"+":"-"}{coinDetail.price24h}% </span></td>
+                                                        <td>
+                                                            <div className="graph_img">
+                                                                <img src={RedGraph} alt="red_graph" />
+                                                            </div>
+                                                        </td>
+                                                        <td><a href="#" className="buy_btn">Buy</a></td>
+                                                    </tr>
+                                                )
+                                            }
                                         </tbody>
                                     </table>
                                 </div>

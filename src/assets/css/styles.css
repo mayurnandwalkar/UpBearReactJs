@@ -919,6 +919,10 @@ label.radio-label span {
   color: #cb7cf5;
 }
 
+.blog-sidebar-inner ul li a.active {
+  color: #cb7cf5;
+}
+
 .currunt-blog {
   padding-left: 30px;
 }

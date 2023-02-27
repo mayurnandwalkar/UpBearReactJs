@@ -1,6 +1,6 @@
 import React from 'react'
 import Chart from "../assets/image/chart1.png"
-import Table from "../assets/image/table1.png"
+import Table from "../assets/image/table3.png"
 
 const Learn = () => {
     return (

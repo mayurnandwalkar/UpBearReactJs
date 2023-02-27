@@ -1,7 +1,21 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
+import authService from '../services/auth.service'
 
 const Login = () => {
+    const HandleSigninButton = (e) => {
+        e.preventDefault();
+        const data = {
+            username:"chintanuser",
+            password:"chintan123"
+        }
+        console.log("firstcall")
+        authService.login(data).then((response) => {
+            console.log(response, "response")
+        }).catch((e) => {
+            console.log(e.response.data.message)
+        })
+    }
   return (
     <>      
       <section className="signup_section form_section">
@@ -23,7 +37,7 @@ const Login = () => {
                             <li>
                                 <a href="#">
                                     <i className='bx bxl-facebook'></i>
-                                    facebook
+                                    Facebook
                                 </a>
                             </li>
                             <li>
@@ -36,10 +50,10 @@ const Login = () => {
                     </div>
                     <div className="form-inputs">
                         <div className="form-group">
-                            <input type="text" className="form-control" placeholder="Username" />
+                            <input type="text" className="form-control" placeholder="Username or Email" />
                         </div>
                         <div className="form-group">
-                            <input type="text" className="form-control" placeholder="Set your password" />
+                            <input type="text" className="form-control" placeholder="Password" />
                         </div>
                         <div className="radio">
                             <input id="radio-1" name="radio" type="radio" />
@@ -50,9 +64,9 @@ const Login = () => {
                             </label>
                         </div>
                     </div>
-                    <button className="btn btn-primary btn-lg px-4 me-md-2">Sign in</button>
+                    <button className="btn btn-primary btn-lg px-4 me-md-2" onClick={HandleSigninButton}>Sign in</button>
                     <div className="have_account">
-                        No Account?? <Link to="/register"> Register Now </Link>
+                    Don’t have an account? <Link to="/register"> Register Now </Link>
                     </div>
                 </div>
             </form>
