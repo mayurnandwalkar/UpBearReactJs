@@ -8,6 +8,7 @@ import Learn from "./Pages/Learn";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import Blog from "./Pages/Blog";
+import Dashboard from "./Pages/Dashboard";
 
 const RouteComponent = () => {
   return (
@@ -18,6 +19,7 @@ const RouteComponent = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/blog/:id" element={<Blog />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
