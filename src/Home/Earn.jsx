@@ -1,50 +1,42 @@
 import React,{ useState,useEffect } from 'react'
-import Bitcoin from "../assets/image/bitcoin-btc-logo.svg"
+// import Bitcoin from "../assets/image/bitcoin-btc-logo.svg"
 import RedGraph from "../assets/image/red_graph.svg"
-import Ethereum from "../assets/image/ethereum.svg"
-import GreenGraph from "../assets/image/green_graph.svg"
-import Solana from "../assets/image/solana-sol-logo.svg"
-import Binance from "../assets/image/binance-usd-busd-logo.svg"
+// import Ethereum from "../assets/image/ethereum.svg"
+// import GreenGraph from "../assets/image/green_graph.svg"
+// import Solana from "../assets/image/solana-sol-logo.svg"
+// import Binance from "../assets/image/binance-usd-busd-logo.svg"
 import coinService from '../services/coin.service'
+import axios from "axios";
 
 const Earn = () => {
-    const [coinDetails, setCoinDetails] = useState([])
-    const [lastApiCall, setLastApiCall] = useState(null);
-    const recurringFunction = async (setdata=false) => {
-        if(setdata){
-            const response1 = await coinService.setCoinsDetails();
-        }
-        const response = await coinService.getCoinsDetails();
-        setCoinDetails(response.data.data)
-    }
+    const [coinDetails, setCoinDetails] = useState();
+    // const [LastCall, setLastCall] = useState();
     useEffect(() => {
         coinService.getCoinsDetails().then((response) => {
             setCoinDetails(response.data.data)
-            const storedTimestamp = new Date(Date.parse(response.data.data[3].updatedAt));
-            if (storedTimestamp) {
-                setLastApiCall(storedTimestamp);
+            const LastCall = (Date.parse(response.data.data[3].updatedAt)+60000);
+            if (LastCall) {
+                const currentTime = Date.parse(new Date());
+                const timeDifference = currentTime-LastCall;
+                if (LastCall === null || timeDifference >= 60000) {
+                    console.log('currentTime')
+                    const intervalId = setInterval(() => {
+                        async function selfcall() {
+                            const response1 = await coinService.setCoinsDetails();
+                            const response = await coinService.getCoinsDetails();
+                            // console.log(response)
+                            setCoinDetails(response.data.data)
+                        }
+                        selfcall()
+                    }, 60000);
+
+                    return () => clearInterval(intervalId);
+                }
             }
         }).catch((e) => {
             console.log(e.response.data.message)
-        })        
-    }, []);
-    useEffect(() => {
-        console.log("first1")
-        const currentTime = new Date();
-        const timeDifference = currentTime - lastApiCall;
-        console.log(lastApiCall,"lastApiCall")
-        console.log(timeDifference,"timeDifference >= 3000")
-        if (lastApiCall === null || timeDifference >= 3000) {
-            console.log("first2")
-            recurringFunction(true);
-            setLastApiCall(currentTime);
-        }
-        const intervalId = setInterval(() => {
-            recurringFunction(true);
-            setLastApiCall(new Date());
-        }, 3000);
-        return () => clearInterval(intervalId);
-    }, [lastApiCall]);
+        }) 
+    }, [LastCall]);
     return (
         <>
             <section className="earn-section section">
@@ -76,13 +68,13 @@ const Earn = () => {
                                                 <th width="450px"> Name </th>
                                                 <th> Price </th>
                                                 <th> 24 change </th>
-                                                <th> 7D Chart </th>
+                                                {/* <th> 7D Chart </th> */}
                                                 <th> Trade </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {
-                                                coinDetails.map((coinDetail,i) =>
+                                                coinDetails?.map((coinDetail,i) =>
                                                     <tr key={i}>
                                                         <td>
                                                             <div className="tableName">
@@ -90,12 +82,12 @@ const Earn = () => {
                                                             </div>
                                                         </td>
                                                         <td>${coinDetail.price}</td>
-                                                        <td><span className="text-green"> {coinDetail.price24h>0?"+":"-"}{coinDetail.price24h}% </span></td>
-                                                        <td>
+                                                        <td><span className={coinDetail.price24h>=0?"text-success":"text-danger"}> {coinDetail.price24h}% </span></td>
+                                                        {/* <td>
                                                             <div className="graph_img">
                                                                 <img src={RedGraph} alt="red_graph" />
                                                             </div>
-                                                        </td>
+                                                        </td> */}
                                                         <td><a href="#" className="buy_btn">Buy</a></td>
                                                     </tr>
                                                 )
@@ -113,7 +105,7 @@ const Earn = () => {
                         </div>
                     </div>
                 </div>
-            </section>            
+            </section> 
         </>
     )
 }
