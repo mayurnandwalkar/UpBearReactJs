@@ -10,7 +10,7 @@ import axios from "axios";
 
 const Earn = () => {
     const [coinDetails, setCoinDetails] = useState();
-    // const [LastCall, setLastCall] = useState();
+    const [LastCall, setLastCall] = useState();
     useEffect(() => {
         coinService.getCoinsDetails().then((response) => {
             setCoinDetails(response.data.data)
