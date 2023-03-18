@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router';
 import authService from '../services/auth.service';
@@ -7,6 +7,13 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
     const navigate = useNavigate();
+    useEffect(() => {
+        var saved = localStorage.getItem('user')
+        const initial = saved !== null ? JSON.parse(saved) : "";
+        if (initial) {
+            navigate("/dashboard")
+        }
+    }, [])
     const [loginFormInputs, setloginFormInputs] = useState({
         email: "",
         password: ""
@@ -22,7 +29,7 @@ const Login = () => {
             password: loginFormInputs.password
         };
         authService.login(submitPayload).then((response) => {
-            console.log(response, "response")
+            // console.log(response, "response")
             navigate('/dashboard');
         }).catch((e) => {
             toast.error(e.response.data.message);

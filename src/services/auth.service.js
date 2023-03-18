@@ -17,6 +17,29 @@ const login = (data) => {
     });
 };
 
+const resetpassword = (data) => {
+  return api
+    .post("/auth/resetpassword", data)
+    .then((response) => {
+      return response.data;
+    });
+};
+
+const verify_rp_token = (data) => {
+  return api
+    .post("/auth/verify_rp_token", data)
+    .then((response) => {
+      return response.data;
+    });
+};
+
+const newpassword = (data) => {
+  return api
+    .post("/auth/newpassword", data)
+    .then((response) => {
+      return response.data;
+    });
+};
 const logout = () => {
   TokenService.removeUser();
 };
@@ -30,6 +53,9 @@ const AuthService = {
   login,
   logout,
   getCurrentUser,
+  resetpassword,
+  verify_rp_token,
+  newpassword
 };
 
 export default AuthService;
