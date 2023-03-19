@@ -48,8 +48,9 @@ const ResetPassword = () => {
             email: rpFormInputs.email,
         };
         authService.resetpassword(submitPayload).then((response) => {
-            console.log(response)
-            toast.success(response.message);
+            if(response.messageId){
+                toast.success("Reset password link sent in your email");
+            }
         }).catch((e) => {
             toast.error(e.response.data.message);
         })
